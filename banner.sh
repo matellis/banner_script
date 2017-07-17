@@ -6,7 +6,7 @@
 usage() {
 echo -e "
 \e[36m---------------------------------------------------------\e[0m
-usage: banner [OPTION] "STRING"
+usage: ./banner.sh [OPTION] "STRING"
 \e[36m---------------------------------------------------------\e[0m
 OPTION:
 -c N    - color code (256 colors mode)
