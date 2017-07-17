@@ -2,14 +2,21 @@
 
 ### Banner with color ###
 # by rern
-#
-# usage: banner [OPTION] "STRING"
-#
-# OPTION:
-# -c N    - color code (256 colors mode)
-# -f file - save to file (to be used as 'cat output')
-#
-# STRING  - all characters will be converted to uppercase
+
+usage() {
+echo -e "
+\e[36m---------------------------------------------------------\e[0m
+usage: banner [OPTION] "STRING"
+\e[36m---------------------------------------------------------\e[0m
+OPTION:
+-c N    - color code (256 colors mode)
+-f file - save to file (to be used as 'cat output')
+-m      - used as 'motd' in terminal login screen
+-r      - restore original 'motd'
+
+STRING  - all characters will be converted to uppercase
+\e[36m---------------------------------------------------------\e[0m"
+}
 
 A1='  #  '
 A2=' # # '
@@ -51,7 +58,7 @@ G1=' ####'
 G2='#    '
 G3='#  ##'
 G4='#   #'
-G5=' ### '
+G5=' ####'
 
 H1='#   #'
 H2='#   #'
@@ -167,8 +174,8 @@ Z3='  #  '
 Z4=' #   '
 Z5='#####'
 
-n11=' ##  '
-n12='  #  '
+n11='  #  '
+n12=' ##  '
 n13='  #  '
 n14='  #  '
 n15=' ### '
@@ -207,7 +214,7 @@ n71='#####'
 n72='   # '
 n73='  #  '
 n74=' #   '
-n75='#    '
+n75=' #   '
 
 n81=' ### '
 n82='#   #'
@@ -245,9 +252,27 @@ sd3='     '
 sd4='  #  '
 sd5='  #  '
 
+sc1='     '
+sc2='     '
+sc3='     '
+sc4=' ##  '
+sc5='  #  '
+
+sl1='  #  '
+sl2=' #   '
+sl3=' #   '
+sl4=' #   '
+sl5='  #  '
+
+sr1='  #  '
+sr2='   # '
+sr3='   # '
+sr4='   # '
+sr5='  #  '
+
 sq1=' ### '
 sq2='#   #'
-sq3='   # '
+sq3='  ## '
 sq4='     '
 sq5='  #  '
 
@@ -257,26 +282,34 @@ sx3='  #  '
 sx4='     '
 sx5='  #  '
 
-usage() {
-	echo -e '\e[36m---------------------------------------------------------\e[0m'
-	echo -e 'usage: banner [OPTION] "STRING"'
-	echo -e '\e[36m---------------------------------------------------------\e[0m'
-	echo 'OPTION:'
-	echo '-c N    - color code (256 colors mode)'
-	echo "-f file - save to file (to be used as 'cat output')"
-	echo
-	echo 'STRING  - all characters will be converted to uppercase'
-	echo -e '\e[36m---------------------------------------------------------\e[0m'
-}
+sh1=' #  # '
+sh2='######'
+sh3=' #  # '
+sh4='######'
+sh5=' #  # '
 
 color=7
 file=''
+motd=0
 while :; do
 	case $1 in
 		-c) color=$2
 			shift;;
 		-f) file=$2
 			shift;;
+		-m) motd=1;;
+		-r) if [[ ! -f /etc/banner ]]; then
+				echo "No custom 'motd' found"
+				exit
+			fi
+			[[ -f /etc/banner ]] && rm /etc/banner
+			[[ -f /etc/profile.d/motd.sh ]] && rm /etc/profile.d/motd.sh
+			sed -i '\|cat /etc/banner|d' /etc/profile
+			mv /etc/motd{.original,}
+			cat /etc/motd
+			echo "Relogin to see this original 'mtod'"
+			exit
+			;;
 		-h|-\?|--help) usage
 			exit;;
 		-?*) echo "unknown option: $1"
@@ -292,14 +325,21 @@ string=${@^^}
 # string to array
 for (( i=0 ; i < ${#string} ; i++ )); do
 	st=${string:i:1}
-	[[ $st == [1-9] ]] && st=n$st
-	[[ $st == 0 ]] && st='O'
-	[[ $st == ' ' ]] && st='sp'
-	[[ $st == '/' ]] && st='ss'
-	[[ $st == '-' ]] && st='sm'
-	[[ $st == '.' ]] && st='sd'
-	[[ $st == '?' ]] && st='sq'
-	[[ $st == '!' ]] && st='sx'
+	case "$st" in
+		[1-9]) st="n$st";;
+		0) st='O';;
+		' ') st='sp';;
+		'/') st='ss';;
+		'-') st='sm';;
+		'.') st='sd';;
+		',') st='sc';;
+		'?') st='sq';;
+		'!') st='sx';;
+		'#') st='sh';;
+		'(') st='sl';;
+		')') st='sr';;
+		[^A-Z,a-z]) st='sp';;
+	esac
 	ar1[i]=${st}1
 	ar2[i]=${st}2
 	ar3[i]=${st}3
@@ -328,8 +368,19 @@ $l5
 
 if [[ $file ]]; then
 	echo -e "$banner" | tee $file
-	echo -e "cat $file \e[38;5;240m# to display\e[0m"
-	echo
+	echo -e "cat $file \e[38;5;240m# to display the banner\e[0m"
+elif [[ $motd ]]; then
+	echo -e "$banner" | tee /etc/banner
+	if [[ -d /etc/profile.d ]]; then
+		echo -e '#!/bin/bash\ncat /etc/banner' > /etc/profile.d/motd.sh
+		chmod +x /etc/profile.d/motd.sh
+	else
+		echo 'cat /etc/banner' >> /etc/profile
+	fi
+	mv /etc/motd{,.original}
+	echo "Relogin to see new 'mtod' banner"
 else
 	echo -e "$banner"
 fi
+
+echo
