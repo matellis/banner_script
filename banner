@@ -3,8 +3,6 @@
 ### Banner with color ###
 # by rern
 
-[[ $# == 0 ]] && usage
-
 usage() {
 echo -e "
 \e[36m---------------------------------------------------------\e[0m
@@ -17,9 +15,11 @@ OPTION:
 -r      - restore original 'motd'
 
 STRING  - all characters will be converted to uppercase
-\e[36m---------------------------------------------------------\e[0m"
+\e[36m---------------------------------------------------------\e[0m
+"
 exit
 }
+[[ $# == 0 ]] && usage
 
 A1='  #  '
 A2=' # # '
