@@ -17,5 +17,5 @@ STRING  - all characters will be converted to uppercase
 
 **Download**
 ```sh
-wget https://github.com/rern/banner_script/raw/master/banner -P /usr/local/bin; chmod +x /usr/local/bin/banner
+wget -qN --show-progress https://github.com/rern/banner_script/raw/master/banner -P /usr/local/bin; chmod +x /usr/local/bin/banner
 ```
