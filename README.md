@@ -4,13 +4,18 @@ banner_script
 ![banner](https://github.com/rern/banner_script/blob/master/banner.png)  
 
 ```sh
-usage: ./banner.sh [OPTION] "STRING"  
+usage:   banner [OPTION] "STRING"
 
-OPTION:  
--c N    - color code (256 colors mode)  
--f file - save to file (to be used as 'cat output')  
+OPTION:
+-c N    - color code (256 colors mode)
+-f file - save to file (to be used as 'cat output')
 -m      - used as 'motd' in terminal login screen
 -r      - restore original 'motd'
 
-STRING  - all characters will be converted to uppercase  
+STRING  - all characters will be converted to uppercase
+```
+
+**Download**
+```sh
+wget https://github.com/rern/banner_script/raw/master/banner -P /usr/local/bin; chmod +x /usr/local/bin/banner
 ```
