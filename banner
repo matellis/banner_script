@@ -1,5 +1,7 @@
 #!/bin/bash
 
+### banner
+#
 ### Banner with color ###
 # by rern
 
@@ -231,69 +233,75 @@ n93=' ####'
 n94='    #'
 n95=' ### '
 
-sp1='     '
-sp2='     '
-sp3='     '
-sp4='     '
-sp5='     '
+space1='     '
+space2='     '
+space3='     '
+space4='     '
+space5='     '
 
-ss1='    #'
-ss2='   # '
-ss3='  #  '
-ss4=' #   '
-ss5='#    '
+slash1='    #'
+slash2='   # '
+slash3='  #  '
+slash4=' #   '
+slash5='#    '
 
-sm1='     '
-sm2='     '
-sm3=' ### '
-sm4='     '
-sm5='     '
+dash1='     '
+dash2='     '
+dash3='#####'
+dash4='     '
+dash5='     '
 
-sd1='     '
-sd2='     '
-sd3='     '
-sd4='  #  '
-sd5='  #  '
+plus1='     '
+plus2='  #  '
+plus3='#####'
+plus4='  #  '
+plus5='     '
 
-sc1='     '
-sc2='     '
-sc3='     '
-sc4=' ##  '
-sc5='  #  '
+dot1='     '
+dot2='     '
+dot3='     '
+dot4=' ### '
+dot5=' ### '
 
-sl1='  #  '
-sl2=' #   '
-sl3=' #   '
-sl4=' #   '
-sl5='  #  '
+comma1='     '
+comma2='     '
+comma3='     '
+comma4=' ##  '
+comma5='  #  '
 
-sr1='  #  '
-sr2='   # '
-sr3='   # '
-sr4='   # '
-sr5='  #  '
+parenl1='  #  '
+parenl2=' #   '
+parenl3=' #   '
+parenl4=' #   '
+parenl5='  #  '
 
-sq1=' ### '
-sq2='#   #'
-sq3='  ## '
-sq4='     '
-sq5='  #  '
+parenr1='  #  '
+parenr2='   # '
+parenr3='   # '
+parenr4='   # '
+parenr5='  #  '
 
-sx1='  #  '
-sx2='  #  '
-sx3='  #  '
-sx4='     '
-sx5='  #  '
+quest1=' ### '
+quest2='#   #'
+quest3='  ## '
+quest4='     '
+quest5='  #  '
 
-sh1=' #  # '
-sh2='######'
-sh3=' #  # '
-sh4='######'
-sh5=' #  # '
+exclaim1='  #  '
+exclaim2='  #  '
+exclaim3='  #  '
+exclaim4='     '
+exclaim5='  #  '
+
+hash1=' #  # '
+hash2='######'
+hash3=' #  # '
+hash4='######'
+hash5=' #  # '
 
 color=7
 file=''
-motd=0
+motd=''
 while :; do
 	case $1 in
 		-c) color=$2
@@ -302,7 +310,7 @@ while :; do
 			shift;;
 		-m) motd=1;;
 		-r) if [[ ! -f /etc/banner ]]; then
-				echo "No custom 'motd' found"
+				echo -e "\nNo custom 'motd' banner found.\n"
 				exit
 			fi
 			[[ -f /etc/banner ]] && rm /etc/banner
@@ -310,14 +318,12 @@ while :; do
 			sed -i '\|cat /etc/banner|d' /etc/profile
 			mv /etc/motd{.original,}
 			cat /etc/motd
-			echo "Relogin to see this original 'mtod'"
+			echo -e "Relogin to see this original 'mtod'.\n"
 			exit
 			;;
 		-h|-\?|--help) usage;;
-		-?*) echo "unknown option: $1"
-			echo "'banner -h'for information"
-			echo
-			exit;;
+		-?*) echo -e "\nUnknown option: $1"
+			usage;;
 		*) break
 	esac
 	shift
@@ -330,17 +336,18 @@ for (( i=0 ; i < ${#string} ; i++ )); do
 	case "$st" in
 		[1-9]) st="n$st";;
 		0) st='O';;
-		' ') st='sp';;
-		'/') st='ss';;
-		'-') st='sm';;
-		'.') st='sd';;
-		',') st='sc';;
-		'?') st='sq';;
-		'!') st='sx';;
-		'#') st='sh';;
-		'(') st='sl';;
-		')') st='sr';;
-		[^A-Z,a-z]) st='sp';;
+		' ') st='space';;
+		'/') st='slash';;
+		'-') st='dash';;
+		'+') st='plus';;
+		'.') st='dot';;
+		',') st='comma';;
+		'?') st='quest';;
+		'!') st='exclaim';;
+		'#') st='hash';;
+		'(') st='parenl';;
+		')') st='parenr';;
+		[^A-Z,a-z]) st='space';;
 	esac
 	ar1[i]=${st}1
 	ar2[i]=${st}2
@@ -368,11 +375,15 @@ $l4
 $l5
 \e[0m"
 
+echo -e "$banner"
+
 if [[ $file ]]; then
-	echo -e "$banner" | tee $file
-	echo -e "cat $file \e[38;5;240m# to display the banner\e[0m"
-elif [[ $motd ]]; then
-	echo -e "$banner" | tee /etc/banner
+	echo -e "$banner" > $file
+	echo -e "\ncat $file \e[38;5;240m# to display the banner\e[0m\n"
+fi
+
+if [[ $motd ]]; then
+	echo -e "$banner" > /etc/banner
 	if [[ -d /etc/profile.d ]]; then
 		echo -e '#!/bin/bash\ncat /etc/banner' > /etc/profile.d/motd.sh
 		chmod +x /etc/profile.d/motd.sh
@@ -380,9 +391,5 @@ elif [[ $motd ]]; then
 		echo 'cat /etc/banner' >> /etc/profile
 	fi
 	mv /etc/motd{,.original}
-	echo "Relogin to see new 'mtod' banner"
-else
-	echo -e "$banner"
+	echo -e "Relogin to see new 'mtod' banner.\n"
 fi
-
-echo
