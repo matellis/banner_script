@@ -4,7 +4,7 @@ banner_script
 ![banner](https://github.com/rern/banner_script/blob/master/banner.png)  
 
 ```sh
-usage: banner [OPTION] "STRING"  
+usage: ./banner.sh [OPTION] "STRING"  
 
 OPTION:  
 -c N    - color code (256 colors mode)  
