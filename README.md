@@ -8,5 +8,7 @@ banner_script
 OPTION:  
 -c N    - color code (256 colors mode)  
 -f file - save to file (to be used as 'cat output')  
+-m      - used as 'motd' in terminal login screen
+-r      - restore original 'motd'
 
 STRING  - all characters will be converted to uppercase  
