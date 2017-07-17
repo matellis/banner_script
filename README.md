@@ -3,7 +3,8 @@ banner_script
 
 ![banner](https://github.com/rern/banner_script/blob/master/banner.png)  
 
-**usage:** banner [OPTION] "STRING"  
+```sh
+usage: banner [OPTION] "STRING"  
 
 OPTION:  
 -c N    - color code (256 colors mode)  
@@ -12,3 +13,4 @@ OPTION:
 -r      - restore original 'motd'
 
 STRING  - all characters will be converted to uppercase  
+```
