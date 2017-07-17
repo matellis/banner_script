@@ -1,4 +1,4 @@
-banner_script
+motd banner script
 ---
 
 ![banner](https://github.com/rern/banner_script/blob/master/banner.png)  
