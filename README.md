@@ -13,7 +13,6 @@ OPTION:
 -r      - restore original 'motd'
 
 STRING  - all characters will be converted to uppercase
-          single quote (') chracter must be separated and double quoted
 ```
 
 **Download**
