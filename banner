@@ -4,12 +4,15 @@
 #
 ### Banner with color ###
 # by rern
+#
+# ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890 .:,;'" +-*/^=<>% !@#$&_|\{[()]}?
 
+hr=$( printf "\e[36m%*s\e[0m\n" "${COLUMNS:-$(tput cols)}" '' | tr ' ' '-' )
 usage() {
 echo -e "
-\e[36m---------------------------------------------------------\e[0m
-usage: banner [OPTION] "STRING"
-\e[36m---------------------------------------------------------\e[0m
+$hr
+usage: banner [OPTION] 'STRING'
+$hr
 OPTION:
 -c N    - color code (256 colors mode)
 -f FILE - save to file (to be used as 'cat file')
@@ -17,7 +20,9 @@ OPTION:
 -r      - restore original 'motd'
 
 STRING  - all characters will be converted to uppercase
-\e[36m---------------------------------------------------------\e[0m
+          single quote (') chracter must be separated and double quoted
+		  length more than terminal width will be truncated
+$hr
 "
 exit
 }
@@ -275,44 +280,30 @@ space=(
 '     '
 '     '
 )
-slash=(
-'    #'
-'   # '
-'  #  '
-' #   '
-'#    '
-)
-dash=(
-'     '
-'     '
-'#####'
-'     '
-'     '
-)
-plus=(
-'     '
-'  #  '
-'#####'
-'  #  '
-'     '
-)
-asterisk=(
-'     '
-'  #  '
-'#####'
-' # # '
-'     '
-)
 dot=(
 '     '
 '     '
 '     '
-' ### '
-' ### '
+' ##  '
+' ##  '
+)
+colon=(
+' ##  '
+' ##  '
+'     '
+' ##  '
+' ##  '
 )
 comma=(
 '     '
 '     '
+'     '
+' ##  '
+'  #  '
+)
+semicolon=(
+' ##  '
+' ##  '
 '     '
 ' ##  '
 '  #  '
@@ -324,33 +315,75 @@ quote=(
 '     '
 '     '
 )
-dblquote=(
+doublequote=(
 ' # # '
 ' # # '
 '     '
 '     '
 '     '
 )
-parenl=(
+plus=(
+'     '
 '  #  '
-' #   '
-' #   '
-' #   '
+'#####'
 '  #  '
+'     '
 )
-parenr=(
-'  #  '
-'   # '
-'   # '
-'   # '
-'  #  '
+dash=(
+'     '
+'     '
+'#####'
+'     '
+'     '
 )
-quest=(
-' ### '
+asterisk=(
+'     '
+'  #  '
+'#####'
+' # # '
+'     '
+)
+slash=(
+'    #'
+'   # '
+'  #  '
+' #   '
+'#    '
+)
+power=(
+'  #  '
+' # # '
 '#   #'
-'  ## '
 '     '
+'     '
+)
+equal=(
+'     '
+'#####'
+'     '
+'#####'
+'     '
+)
+less=(
+'    #'
 '  #  '
+'#    '
+'  #  '
+'    #'
+)
+more=(
+'#    '
+'  #  '
+'    #'
+'  #  '
+'#    '
+)
+percent=(
+'##  #'
+'## # '
+'  #  '
+' # ##'
+'#  ##'
 )
 exclaim=(
 '  #  '
@@ -359,12 +392,103 @@ exclaim=(
 '     '
 '  #  '
 )
+at=(
+' ### '
+'#   #'
+'# ###'
+'# # #'
+' ####'
+)
 hash=(
-' #  # '
-'######'
-' #  # '
-'######'
-' #  # '
+' # # '
+'#####'
+' # # '
+'#####'
+' # # '
+)
+dollar=(
+' ####'
+'# #  '
+' ### '
+'  # #'
+'#### '
+)
+ampersand=(
+' ##  '
+' ##  '
+'# # #'
+'#  # '
+' ## #'
+)
+underscore=(
+'     '
+'     '
+'     '
+'     '
+'#####'
+)
+pipe=(
+'  #  '
+'  #  '
+'  #  '
+'  #  '
+'  #  '
+)
+backslash=(
+'#    '
+' #   '
+'  #  '
+'   # '
+'    #'
+)
+curlL=(
+'  ## '
+' #   '
+'##   '
+' #   '
+'  ## '
+)
+bracketL=(
+' ### '
+' #   '
+' #   '
+' #   '
+' ### '
+)
+parenthesesL=(
+'  #  '
+' #   '
+' #   '
+' #   '
+'  #  '
+)
+parenthesesR=(
+'  #  '
+'   # '
+'   # '
+'   # '
+'  #  '
+)
+bracketR=(
+' ### '
+'   # '
+'   # '
+'   # '
+' ### '
+)
+curlR=(
+' ##  '
+'   # '
+'   ##'
+'   # '
+' ##  '
+)
+question=(
+' ### '
+'#   #'
+'   # '
+'  #  '
+'  #  '
 )
 
 colorl=''
@@ -400,6 +524,11 @@ while :; do
 done
 
 string=${@^^}
+# truncate to terminal width
+column=$( tput cols )
+length=$(( column / 6 - 1 )) 
+string=${string:0:$length}
+
 # loop string to array
 for (( i=0 ; i < ${#string} ; i++ )); do
 	# extract each character
@@ -409,19 +538,36 @@ for (( i=0 ; i < ${#string} ; i++ )); do
 		[1-9]) char="n$char";;
 		0) char='O';;
 		' ') char='space';;
-		'/') char='slash';;
-		'-') char='dash';;
-		'+') char='plus';;
-		'*') char='asterisk';;
 		'.') char='dot';;
+		':') char='colon';;
 		',') char='comma';;
+		';') char='semicolon';;
 		"'") char='quote';;
-		'"') char='dblquote';;
-		'?') char='quest';;
+		'"') char='doublequote';;
+		'+') char='plus';;
+		'-') char='dash';;
+		'*') char='asterisk';;
+		'/') char='slash';;
+		'^') char='power';;
+		'=') char='equal';;
+		'<') char='less';;
+		'>') char='more';;
+		'%') char='percent';;
 		'!') char='exclaim';;
+		'@') char='at';;
 		'#') char='hash';;
-		'(') char='parenl';;
-		')') char='parenr';;
+		'$') char='dollar';;
+		'&') char='ampersand';;
+		'_') char='underscore';;
+		'|') char='pipe';;
+		'\') char='backslash';;
+		'{') char='curlL';;
+		'[') char='bracketL';;
+		'(') char='parenthesesL';;
+		')') char='parenthesesR';;
+		']') char='bracketR';;
+		'}') char='curlR';;
+		'?') char='question';;
 		[^A-Z,a-z]) char='space';;
 	esac
 	# array - name of each line of each character: ar0=(A[0], B[0], C[0], ..)
