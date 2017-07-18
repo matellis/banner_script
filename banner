@@ -23,300 +23,370 @@ exit
 }
 [[ $# == 0 ]] && usage
 
-A1='  #  '
-A2=' # # '
-A3='#   #'
-A4='#####'
-A5='#   #'
+A=(
+'  #  '
+' # # '
+'#   #'
+'#####'
+'#   #'
+)
+B=(
+'#### '
+'#   #'
+'#### '
+'#   #'
+'#### '
+)
+C=(
+' ### '
+'#   #'
+'#    '
+'#   #'
+' ### '
+)
+D=(
+'#### '
+'#   #'
+'#   #'
+'#   #'
+'#### '
+)
+E=(
+'#####'
+'#    '
+'###  '
+'#    '
+'#####'
+)
+F=(
+'#####'
+'#    '
+'###  '
+'#    '
+'#    '
+)
+G=(
+' ####'
+'#    '
+'#  ##'
+'#   #'
+' ####'
+)
+H=(
+'#   #'
+'#   #'
+'#####'
+'#   #'
+'#   #'
+)
+I=(
+' ### '
+'  #  '
+'  #  '
+'  #  '
+' ### '
+)
+J=(
+'  ###'
+'    #'
+'    #'
+'#   #'
+' ### '
+)
+K=(
+'#   #'
+'#  # '
+'###  '
+'#  # '
+'#   #'
+)
+L=(
+'#    '
+'#    '
+'#    '
+'#    '
+'#####'
+)
+M=(
+'#   #'
+'## ##'
+'# # #'
+'#   #'
+'#   #'
+)
+N=(
+'#   #'
+'##  #'
+'# # #'
+'#  ##'
+'#   #'
+)
+O=(
+' ### '
+'#   #'
+'#   #'
+'#   #'
+' ### '
+)
+P=(
+'#### '
+'#   #'
+'#### '
+'#    '
+'#    '
+)
+Q=(
+' ### '
+'#   #'
+'# # #'
+'#  # '
+' ## #'
+)
+R=(
+'#### '
+'#   #'
+'#### '
+'#  # '
+'#   #'
+)
+S=(
+' ####'
+'#    '
+' ### '
+'    #'
+'#### '
+)
+T=(
+'#####'
+'  #  '
+'  #  '
+'  #  '
+'  #  '
+)
+U=(
+'#   #'
+'#   #'
+'#   #'
+'#   #'
+' ### '
+)
+V=(
+'#   #'
+'#   #'
+'#   #'
+' # # '
+'  #  '
+)
+W=(
+'#   #'
+'#   #'
+'# # #'
+'## ##'
+'#   #'
+)
+X=(
+'#   #'
+' # # '
+'  #  '
+' # # '
+'#   #'
+)
+Y=(
+'#   #'
+' # # '
+'  #  '
+'  #  '
+'  #  '
+)
+Z=(
+'#####'
+'   # '
+'  #  '
+' #   '
+'#####'
+)
+n1=(
+'  #  '
+' ##  '
+'  #  '
+'  #  '
+' ### '
+)
+n2=(
+' ### '
+'#   #'
+'   # '
+' #   '
+'#####'
+)
+n3=(
+' ### '
+'#   #'
+'   # '
+'#   #'
+' ### '
+)
+n4=(
+'   # '
+'  ## '
+' # # '
+'#####'
+'   # '
+)
+n5=(
+'#### '
+'#    '
+'#### '
+'    #'
+'#### '
+)
+n6=(
+' ### '
+'#    '
+'#####'
+'#   #'
+' ### '
+)
+n7=(
+'#####'
+'   # '
+'  #  '
+' #   '
+' #   '
+)
+n8=(
+' ### '
+'#   #'
+' ### '
+'#   #'
+' ### '
+)
+n9=(
+' ### '
+'#   #'
+' ####'
+'    #'
+' ### '
+)
+space=(
+'     '
+'     '
+'     '
+'     '
+'     '
+)
+slash=(
+'    #'
+'   # '
+'  #  '
+' #   '
+'#    '
+)
+dash=(
+'     '
+'     '
+'#####'
+'     '
+'     '
+)
+plus=(
+'     '
+'  #  '
+'#####'
+'  #  '
+'     '
+)
+asterisk=(
+'     '
+'  #  '
+'#####'
+' # # '
+'     '
+)
+dot=(
+'     '
+'     '
+'     '
+' ### '
+' ### '
+)
+comma=(
+'     '
+'     '
+'     '
+' ##  '
+'  #  '
+)
+quote=(
+'  #  '
+'  #  '
+'     '
+'     '
+'     '
+)
+dblquote=(
+' # # '
+' # # '
+'     '
+'     '
+'     '
+)
+parenl=(
+'  #  '
+' #   '
+' #   '
+' #   '
+'  #  '
+)
+parenr=(
+'  #  '
+'   # '
+'   # '
+'   # '
+'  #  '
+)
+quest=(
+' ### '
+'#   #'
+'  ## '
+'     '
+'  #  '
+)
+exclaim=(
+'  #  '
+'  #  '
+'  #  '
+'     '
+'  #  '
+)
+hash=(
+' #  # '
+'######'
+' #  # '
+'######'
+' #  # '
+)
 
-B1='#### '
-B2='#   #'
-B3='#### '
-B4='#   #'
-B5='#### '
-
-C1=' ### '
-C2='#   #'
-C3='#    '
-C4='#   #'
-C5=' ### '
-
-D1='#### '
-D2='#   #'
-D3='#   #'
-D4='#   #'
-D5='#### '
-
-E1='#####'
-E2='#    '
-E3='###  '
-E4='#    '
-E5='#####'
-
-F1='#####'
-F2='#    '
-F3='###  '
-F4='#    '
-F5='#    '
-
-G1=' ####'
-G2='#    '
-G3='#  ##'
-G4='#   #'
-G5=' ####'
-
-H1='#   #'
-H2='#   #'
-H3='#####'
-H4='#   #'
-H5='#   #'
-
-I1=' ### '
-I2='  #  '
-I3='  #  '
-I4='  #  '
-I5=' ### '
-
-J1='  ###'
-J2='    #'
-J3='    #'
-J4='#   #'
-J5=' ### '
-
-K1='#   #'
-K2='#  # '
-K3='###  '
-K4='#  # '
-K5='#   #'
-
-L1='#    '
-L2='#    '
-L3='#    '
-L4='#    '
-L5='#####'
-
-M1='#   #'
-M2='## ##'
-M3='# # #'
-M4='#   #'
-M5='#   #'
-
-N1='#   #'
-N2='##  #'
-N3='# # #'
-N4='#  ##'
-N5='#   #'
-
-O1=' ### '
-O2='#   #'
-O3='#   #'
-O4='#   #'
-O5=' ### '
-
-P1='#### '
-P2='#   #'
-P3='#### '
-P4='#    '
-P5='#    '
-
-Q1=' ### '
-Q2='#   #'
-Q3='# # #'
-Q4='#  # '
-Q5=' ## #'
-
-R1='#### '
-R2='#   #'
-R3='#### '
-R4='#  # '
-R5='#   #'
-
-S1=' ####'
-S2='#    '
-S3=' ### '
-S4='    #'
-S5='#### '
-
-T1='#####'
-T2='  #  '
-T3='  #  '
-T4='  #  '
-T5='  #  '
-
-U1='#   #'
-U2='#   #'
-U3='#   #'
-U4='#   #'
-U5=' ### '
-
-V1='#   #'
-V2='#   #'
-V3='#   #'
-V4=' # # '
-V5='  #  '
-
-W1='#   #'
-W2='#   #'
-W3='# # #'
-W4='## ##'
-W5='#   #'
-
-X1='#   #'
-X2=' # # '
-X3='  #  '
-X4=' # # '
-X5='#   #'
-
-Y1='#   #'
-Y2=' # # '
-Y3='  #  '
-Y4='  #  '
-Y5='  #  '
-
-Z1='#####'
-Z2='   # '
-Z3='  #  '
-Z4=' #   '
-Z5='#####'
-
-n11='  #  '
-n12=' ##  '
-n13='  #  '
-n14='  #  '
-n15=' ### '
-
-n21=' ### '
-n22='#   #'
-n23='   # '
-n24=' #   '
-n25='#####'
-
-n31=' ### '
-n32='#   #'
-n33='   # '
-n34='#   #'
-n35=' ### '
-
-n41='   # '
-n42='  ## '
-n43=' # # '
-n44='#####'
-n45='   # '
-
-n51='#### '
-n52='#    '
-n53='#### '
-n54='    #'
-n55='#### '
-
-n61=' ### '
-n62='#    '
-n63='#####'
-n64='#   #'
-n65=' ### '
-
-n71='#####'
-n72='   # '
-n73='  #  '
-n74=' #   '
-n75=' #   '
-
-n81=' ### '
-n82='#   #'
-n83=' ### '
-n84='#   #'
-n85=' ### '
-
-n91=' ### '
-n92='#   #'
-n93=' ####'
-n94='    #'
-n95=' ### '
-
-space1='     '
-space2='     '
-space3='     '
-space4='     '
-space5='     '
-
-slash1='    #'
-slash2='   # '
-slash3='  #  '
-slash4=' #   '
-slash5='#    '
-
-dash1='     '
-dash2='     '
-dash3='#####'
-dash4='     '
-dash5='     '
-
-plus1='     '
-plus2='  #  '
-plus3='#####'
-plus4='  #  '
-plus5='     '
-
-dot1='     '
-dot2='     '
-dot3='     '
-dot4=' ### '
-dot5=' ### '
-
-comma1='     '
-comma2='     '
-comma3='     '
-comma4=' ##  '
-comma5='  #  '
-
-parenl1='  #  '
-parenl2=' #   '
-parenl3=' #   '
-parenl4=' #   '
-parenl5='  #  '
-
-parenr1='  #  '
-parenr2='   # '
-parenr3='   # '
-parenr4='   # '
-parenr5='  #  '
-
-quest1=' ### '
-quest2='#   #'
-quest3='  ## '
-quest4='     '
-quest5='  #  '
-
-exclaim1='  #  '
-exclaim2='  #  '
-exclaim3='  #  '
-exclaim4='     '
-exclaim5='  #  '
-
-hash1=' #  # '
-hash2='######'
-hash3=' #  # '
-hash4='######'
-hash5=' #  # '
-
-color=7
+colorl=''
+colorr=''
 file=''
 motd=''
 while :; do
 	case $1 in
-		-c) color=$2
+		-c) colorl="\e[38;5;${2}m"
+			colorr="\e[0m"
 			shift;;
 		-f) file=$2
 			shift;;
 		-m) motd=1;;
-		-r) if [[ ! -f /etc/banner ]]; then
+		-r) if [[ ! -f /etc/motd.banner ]]; then
 				echo -e "\nNo custom 'motd' banner found.\n"
 				exit
 			fi
-			[[ -f /etc/banner ]] && rm /etc/banner
-			[[ -f /etc/profile.d/motd.sh ]] && rm /etc/profile.d/motd.sh
+			rm -f /etc/motd.banner
+			rm -f /etc/profile.d/motd.sh
 			sed -i '\|cat /etc/banner|d' /etc/profile
-			mv /etc/motd{.original,}
+			[[ -e /etc/motd.original ]] && mv /etc/motd{.original,}
 			cat /etc/motd
 			echo -e "Relogin to see this original 'mtod'.\n"
 			exit
@@ -330,65 +400,73 @@ while :; do
 done
 
 string=${@^^}
-# string to array
+# loop string to array
 for (( i=0 ; i < ${#string} ; i++ )); do
-	st=${string:i:1}
-	case "$st" in
-		[1-9]) st="n$st";;
-		0) st='O';;
-		' ') st='space';;
-		'/') st='slash';;
-		'-') st='dash';;
-		'+') st='plus';;
-		'.') st='dot';;
-		',') st='comma';;
-		'?') st='quest';;
-		'!') st='exclaim';;
-		'#') st='hash';;
-		'(') st='parenl';;
-		')') st='parenr';;
-		[^A-Z,a-z]) st='space';;
+	# extract each character
+	char=${string:i:1}
+	# numbers and symbols substitue to use as variable names
+	case "$char" in
+		[1-9]) char="n$char";;
+		0) char='O';;
+		' ') char='space';;
+		'/') char='slash';;
+		'-') char='dash';;
+		'+') char='plus';;
+		'*') char='asterisk';;
+		'.') char='dot';;
+		',') char='comma';;
+		"'") char='quote';;
+		'"') char='dblquote';;
+		'?') char='quest';;
+		'!') char='exclaim';;
+		'#') char='hash';;
+		'(') char='parenl';;
+		')') char='parenr';;
+		[^A-Z,a-z]) char='space';;
 	esac
-	ar1[i]=${st}1
-	ar2[i]=${st}2
-	ar3[i]=${st}3
-	ar4[i]=${st}4
-	ar5[i]=${st}5
+	# array - name of each line of each character: ar0=(A[0], B[0], C[0], ..)
+	ar0[i]=${char}[0]
+	ar1[i]=${char}[1]
+	ar2[i]=${char}[2]
+	ar3[i]=${char}[3]
+	ar4[i]=${char}[4]
 done
 
-# arrayN to line composite
-l1=""; l2=""; l3=""; l4=""; l5=""
+# line - compose with '!'indirect variables to array: li0=" $A[0] $B[0] $C[0] ... "
+li0=" " li1=" "; li2=" "; li3=" "; li4=" "
 for (( i=0 ; i < ${#string} ; i++ )); do
-	l1=$l1"${!ar1[i]} "
-	l2=$l2"${!ar2[i]} "
-	l3=$l3"${!ar3[i]} "
-	l4=$l4"${!ar4[i]} "
-	l5=$l5"${!ar5[i]} "
+	li0=$li0"${!ar0[i]} "
+	li1=$li1"${!ar1[i]} "
+	li2=$li2"${!ar2[i]} "
+	li3=$li3"${!ar3[i]} "
+	li4=$li4"${!ar4[i]} "
 done
 
 # output
-banner="\e[38;5;${color}m
-$l1
-$l2
-$l3
-$l4
-$l5
-\e[0m"
+banner="$colorl
+$li0
+$li1
+$li2
+$li3
+$li4
+$colorr"
 
 echo -e "$banner"
 
+# save to file
 if [[ $file ]]; then
 	echo -e "$banner" > $file
 	echo -e "\ncat $file \e[38;5;240m# to display the banner\e[0m\n"
 fi
 
+# modify 'motd'
 if [[ $motd ]]; then
-	echo -e "$banner" > /etc/banner
+	echo -e "$banner" > /etc/motd.banner
 	if [[ -d /etc/profile.d ]]; then
-		echo -e '#!/bin/bash\ncat /etc/banner' > /etc/profile.d/motd.sh
+		echo -e '#!/bin/bash\ncat /etc/motd.banner' > /etc/profile.d/motd.sh
 		chmod +x /etc/profile.d/motd.sh
 	else
-		echo 'cat /etc/banner' >> /etc/profile
+		echo 'cat /etc/motd.banner' >> /etc/profile
 	fi
 	mv /etc/motd{,.original}
 	echo -e "Relogin to see new 'mtod' banner.\n"
