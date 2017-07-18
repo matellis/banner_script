@@ -4,7 +4,7 @@ motd banner script
 ![banner](https://github.com/rern/banner_script/blob/master/banner.png)  
 
 ```
-usage:   banner [OPTION] "STRING"
+usage:   banner [OPTION] 'STRING'
 
 OPTION:
 -c N    - color code (256 colors mode)
