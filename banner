@@ -646,6 +646,6 @@ fi
 # for usage function
 example() {
 	line2banner 'banner|script'
-	echo -e "\e[32m$lines\e[0m"
+	echo -e "\e[36m$lines\e[0m"
 }
 [[ $# == 0 ]] && usage
