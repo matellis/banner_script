@@ -5,17 +5,16 @@
 ### Banner with color ###
 # by rern
 #
-# ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890 .:,;" +-*/^=<>% !@#$&_|\{[()]}?'
 
 hr=$( printf "\e[36m%*s\e[0m\n" "${COLUMNS:-$(tput cols)}" '' | tr ' ' '-' )
 
 usage() {
 	example
+	echo "example:  banner -c 6 'banner|script'"
 	echo -e "
 $hr
 usage  :  banner [OPTION] 'STRING'
 $hr
-example:  banner -c 6 'banner'
 
 OPTION:
 -c N    - color code              (256 colors mode)
@@ -23,12 +22,16 @@ OPTION:
 -m      - used as 'motd'          (in terminal login screen)
 -r      - restore original 'motd'
 
-STRING  - all characters will be converted to uppercase
+STRING    a-z (lowercase) : will be converted to uppercase
+          ' (single quote): must be escaped and place outside quotes
+          | (pipe)        : manual line break position
 $hr
 	"
 	exit
 }
 
+# functions
+################################################################################
 string2array() {
 	str="${@^^}" # convert to uppercase
 	for (( i=0 ; i < ${#str} ; i++ )); do
@@ -60,7 +63,6 @@ string2array() {
 			'$') char='dollar';;
 			'&') char='ampersand';;
 			'_') char='underscore';;
-			'|') char='I';;
 			'\') char='backslash';;
 			'{') char='curlL';;
 			'[') char='bracketL';;
@@ -79,12 +81,12 @@ string2array() {
 		ar4[i]=${char}[4]
 	done
 }
-# compose with '!'indirect variables to array: li0=" $A[0] $B[0] $C[0] ... "
+
 lines=''
-compose() {
+array2line() { # with '!'indirect variables to array: li0=" $A[0] $B[0] $C[0] ... "
 	# sublines
 	li0=" " li1=" "; li2=" "; li3=" "; li4=" "
-	for (( i=$1 ; i < $2 ; i++ )); do
+	for (( i=$1 ; i < $2 ; i++ )); do # '$1'start '$2'end of each line
 		li0=$li0"${!ar0[i]} "
 		li1=$li1"${!ar1[i]} "
 		li2=$li2"${!ar2[i]} "
@@ -94,6 +96,69 @@ compose() {
 	# sublines to lines
 	lines=$lines"\n$li0\n$li1\n$li2\n$li3\n$li4\n"
 }
+
+line2banner() {
+# auto line wrap
+if ! expr index "$1" '|' &> /dev/null; then
+	# line wrap to terminal width
+	width=$( tput cols )         # terminal width
+	perline=$(( width / 6 - 1 )) # banner characters per line
+	stringlength="${#1}"           # string length
+	lastline=0                   
+	[[ $(( stringlength % perline )) > 0 ]] && lastline=1 # remainder line
+	bannerline=$(( stringlength / perline + lastline ))   # total banner lines
+
+	string2array "$1" # convert input string to array
+	charcount=$perline
+	for (( i=0 ; i < $stringlength ; $(let "i+=$perline") )); do # convert array to banner lines
+		array2line $i $charcount
+		charcount=$(( charcount + perline ))
+	done
+# manual line wrap with '|'
+else
+	IFS='|' read -ra linearray <<< "$1"     # split string by '|'
+	for (( j=0; j < ${#linearray[*]}; j++ )); do # 'j' keep separation from 'i' loop
+		ar0=(); ar1=(); ar2=(); ar3=(); ar4=()   # empty subline arrays
+		string2array "${linearray[j]}"
+		array2line 0 ${#linearray[j]}
+	done
+fi
+}
+
+# options
+colorL=''
+colorR=''
+file=''
+motd=''
+while :; do
+	case $1 in
+		-c) colorL="\e[38;5;${2}m"
+			colorR="\e[0m"
+			shift;;
+		-f) file=$2
+			shift;;
+		-m) motd=1;;
+		-r) if [[ ! -f /etc/motd.banner ]]; then
+				echo -e "\nNo custom 'motd' banner found.\n"
+				exit
+			fi
+			rm -f /etc/motd.banner
+			rm -f /etc/profile.d/motd.sh
+			sed -i '\|cat /etc/banner|d' /etc/profile
+			[[ -e /etc/motd.original ]] && mv /etc/motd{.original,}
+			cat /etc/motd
+			echo -e "Relogin to see this original 'mtod'.\n"
+			exit;;
+		-h|-\?|--help) ;;
+		-?*) echo -e "\nUnknown option: $1";;
+		*) break
+	esac
+	shift
+done
+
+# variables - font matrix
+################################################################################
+# ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890.:,;"+-*/^=<>%!@#$&_\{[()]}?'
 
 A=(
 '  #  '
@@ -551,55 +616,9 @@ quote=(
 '     '
 )
 
-colorL=''
-colorR=''
-file=''
-motd=''
-while :; do
-	case $1 in
-		-c) colorL="\e[38;5;${2}m"
-			colorR="\e[0m"
-			shift;;
-		-f) file=$2
-			shift;;
-		-m) motd=1;;
-		-r) if [[ ! -f /etc/motd.banner ]]; then
-				echo -e "\nNo custom 'motd' banner found.\n"
-				exit
-			fi
-			rm -f /etc/motd.banner
-			rm -f /etc/profile.d/motd.sh
-			sed -i '\|cat /etc/banner|d' /etc/profile
-			[[ -e /etc/motd.original ]] && mv /etc/motd{.original,}
-			cat /etc/motd
-			echo -e "Relogin to see this original 'mtod'.\n"
-			exit;;
-		-h|-\?|--help) usage;;
-		-?*) echo -e "\nUnknown option: $1"
-			usage;;
-		*) break
-	esac
-	shift
-done
-
-# line wrap to terminal width
-width=$( tput cols )         # terminal width
-perline=$(( width / 6 - 1 )) # banner characters per line
-string="$@"
-stringlength="${#string}"           # string length
-lastline=0                   
-[[ $(( stringlength % perline )) > 0 ]] && lastline=1 # remainder line
-bannerline=$(( stringlength / perline + lastline ))   # total banner lines
-
-# convert to array
-string2array "$string"
-
-# convert to banner lines
-charcount=$perline
-for (( i=0 ; i < $stringlength ; $(let "i+=$perline") )); do
-	compose $i $charcount
-	charcount=$(( charcount + perline ))
-done
+# commands
+################################################################################
+line2banner "$@"
 
 # output
 banner="$colorL$lines$colorR"
@@ -624,11 +643,9 @@ if [[ $motd ]]; then
 	echo -e "Relogin to see new 'mtod' banner.\n"
 fi
 
+# for usage function
 example() {
-	string2array banner
-	lines=''
-	compose 0 13
-	echo -e "\e[36m$lines\e[0m"
+	line2banner 'banner|script'
+	echo -e "\e[32m$lines\e[0m"
 }
 [[ $# == 0 ]] && usage
-
