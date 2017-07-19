@@ -484,14 +484,6 @@ quote=(
 '     '
 )
 
-yesno() {
-	echo -e '  \e[0;36m0\e[m No'
-	echo -e '  \e[0;36m1\e[m Yes'
-	echo
-	echo -e '\e[0;36m0\e[m / 1 ? '
-	read -n 1 answer
-	[[ $answer == 1 ]] && "$@"
-}
 colorL=''
 colorR=''
 file=''
@@ -513,8 +505,7 @@ while :; do
 			sed -i '\|cat /etc/banner|d' /etc/profile
 			[[ -e /etc/motd.original ]] && mv /etc/motd{.original,}
 			cat /etc/motd
-			echo -e "Relogin to see this original 'mtod':"
-			yesno "kill -9 $PPID";;
+			echo -e "Relogin to see this original 'mtod'."
 		-h|-\?|--help) usage;;
 		-?*) echo -e "\nUnknown option: $1"
 			usage;;
