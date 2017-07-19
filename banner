@@ -8,25 +8,92 @@
 # ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890 .:,;" +-*/^=<>% !@#$&_|\{[()]}?'
 
 hr=$( printf "\e[36m%*s\e[0m\n" "${COLUMNS:-$(tput cols)}" '' | tr ' ' '-' )
+
 usage() {
-echo -e "
+	example
+	echo -e "
 $hr
 usage  :  banner [OPTION] 'STRING'
 $hr
-example:  banner -c 2 'ABCDEFGHIJKLM'
+example:  banner -c 6 'banner'
 
 OPTION:
--c N    - color code (256 colors mode)
--f FILE - save to file (to be used as 'cat file')
--m      - used as 'motd' in terminal login screen
+-c N    - color code              (256 colors mode)
+-f FILE - save to file            (to be used as 'cat file')
+-m      - used as 'motd'          (in terminal login screen)
 -r      - restore original 'motd'
 
 STRING  - all characters will be converted to uppercase
 $hr
-"
-exit
+	"
+	exit
 }
-[[ $# == 0 ]] && usage
+
+string2array() {
+	str="${@^^}" # convert to uppercase
+	for (( i=0 ; i < ${#str} ; i++ )); do
+		# extract each character
+		char=${str:i:1}
+		# numbers and symbols substitue to use as variable names
+		case "$char" in
+			[1-9]) char="n$char";;
+			0) char='O';;
+			' ') char='space';;
+			'.') char='dot';;
+			':') char='colon';;
+			',') char='comma';;
+			';') char='semicolon';;
+			"'") char='quote';;
+			'"') char='doublequote';;
+			'+') char='plus';;
+			'-') char='dash';;
+			'*') char='asterisk';;
+			'/') char='slash';;
+			'^') char='power';;
+			'=') char='equal';;
+			'<') char='less';;
+			'>') char='more';;
+			'%') char='percent';;
+			'!') char='exclaim';;
+			'@') char='at';;
+			'#') char='hash';;
+			'$') char='dollar';;
+			'&') char='ampersand';;
+			'_') char='underscore';;
+			'|') char='I';;
+			'\') char='backslash';;
+			'{') char='curlL';;
+			'[') char='bracketL';;
+			'(') char='parenthesesL';;
+			')') char='parenthesesR';;
+			']') char='bracketR';;
+			'}') char='curlR';;
+			'?') char='question';;
+			[^A-Z,a-z]) char='space';;
+		esac
+		# array - name of each line of each character: ar0=(A[0], B[0], C[0], ..)
+		ar0[i]=${char}[0]
+		ar1[i]=${char}[1]
+		ar2[i]=${char}[2]
+		ar3[i]=${char}[3]
+		ar4[i]=${char}[4]
+	done
+}
+# compose with '!'indirect variables to array: li0=" $A[0] $B[0] $C[0] ... "
+lines=''
+compose() {
+	# sublines
+	li0=" " li1=" "; li2=" "; li3=" "; li4=" "
+	for (( i=$1 ; i < $2 ; i++ )); do
+		li0=$li0"${!ar0[i]} "
+		li1=$li1"${!ar1[i]} "
+		li2=$li2"${!ar2[i]} "
+		li3=$li3"${!ar3[i]} "
+		li4=$li4"${!ar4[i]} "
+	done
+	# sublines to lines
+	lines=$lines"\n$li0\n$li1\n$li2\n$li3\n$li4\n"
+}
 
 A=(
 '  #  '
@@ -505,7 +572,8 @@ while :; do
 			sed -i '\|cat /etc/banner|d' /etc/profile
 			[[ -e /etc/motd.original ]] && mv /etc/motd{.original,}
 			cat /etc/motd
-			echo "Relogin to see this original 'mtod'.";;
+			echo -e "Relogin to see this original 'mtod'.\n"
+			exit;;
 		-h|-\?|--help) usage;;
 		-?*) echo -e "\nUnknown option: $1"
 			usage;;
@@ -514,85 +582,19 @@ while :; do
 	shift
 done
 
-# convert to uppercase
-string="${@^^}"
-
-# loop string to array
-for (( i=0 ; i < ${#string} ; i++ )); do
-	# extract each character
-	char=${string:i:1}
-	# numbers and symbols substitue to use as variable names
-	case "$char" in
-		[1-9]) char="n$char";;
-		0) char='O';;
-		' ') char='space';;
-		'.') char='dot';;
-		':') char='colon';;
-		',') char='comma';;
-		';') char='semicolon';;
-		"'") char='quote';;
-		'"') char='doublequote';;
-		'+') char='plus';;
-		'-') char='dash';;
-		'*') char='asterisk';;
-		'/') char='slash';;
-		'^') char='power';;
-		'=') char='equal';;
-		'<') char='less';;
-		'>') char='more';;
-		'%') char='percent';;
-		'!') char='exclaim';;
-		'@') char='at';;
-		'#') char='hash';;
-		'$') char='dollar';;
-		'&') char='ampersand';;
-		'_') char='underscore';;
-		'|') char='I';;
-		'\') char='backslash';;
-		'{') char='curlL';;
-		'[') char='bracketL';;
-		'(') char='parenthesesL';;
-		')') char='parenthesesR';;
-		']') char='bracketR';;
-		'}') char='curlR';;
-		'?') char='question';;
-		[^A-Z,a-z]) char='space';;
-	esac
-	# array - name of each line of each character: ar0=(A[0], B[0], C[0], ..)
-	ar0[i]=${char}[0]
-	ar1[i]=${char}[1]
-	ar2[i]=${char}[2]
-	ar3[i]=${char}[3]
-	ar4[i]=${char}[4]
-done
-
-# compose with '!'indirect variables to array: li0=" $A[0] $B[0] $C[0] ... "
-lines=''
-compose() {
-	# sublines
-	li0=" " li1=" "; li2=" "; li3=" "; li4=" "
-	for (( i=$1 ; i < $2 ; i++ )); do
-		li0=$li0"${!ar0[i]} "
-		li1=$li1"${!ar1[i]} "
-		li2=$li2"${!ar2[i]} "
-		li3=$li3"${!ar3[i]} "
-		li4=$li4"${!ar4[i]} "
-	done
-	# sublines to lines
-	lines=$lines"\n$li0\n$li1\n$li2\n$li3\n$li4\n"
-}
-
 # line wrap to terminal width
 width=$( tput cols )         # terminal width
 perline=$(( width / 6 - 1 )) # banner characters per line
-stringlength=${#string}      # string length
+string="$@"
+stringlength="${#string}"           # string length
 lastline=0                   
-if [[ $(( stringlength % perline )) > 0 ]]; then    # remainder
-	lastline=1
-fi
-bannerline=$(( stringlength / perline + lastline )) # total banner lines
+[[ $(( stringlength % perline )) > 0 ]] && lastline=1 # remainder line
+bannerline=$(( stringlength / perline + lastline ))   # total banner lines
 
-# loop each banner line
+# convert to array
+string2array "$string"
+
+# convert to banner lines
 charcount=$perline
 for (( i=0 ; i < $stringlength ; $(let "i+=$perline") )); do
 	compose $i $charcount
@@ -619,5 +621,14 @@ if [[ $motd ]]; then
 		echo 'cat /etc/motd.banner' >> /etc/profile
 	fi
 	mv /etc/motd{,.original}
-	echo "Relogin to see new 'mtod' banner.\n"
+	echo -e "Relogin to see new 'mtod' banner.\n"
 fi
+
+example() {
+	string2array banner
+	lines=''
+	compose 0 13
+	echo -e "\e[36m$lines\e[0m"
+}
+[[ $# == 0 ]] && usage
+
