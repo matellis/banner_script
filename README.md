@@ -5,7 +5,7 @@ Bash script for custom motd text banner
 - large text
 - color
 - auto / manual line break
-- `motd` auto modification / restore
+- [**`motd`**](https://en.wikipedia.org/wiki/Motd_(Unix)) auto modification / restore
 
 ![banner](https://github.com/rern/banner_script/blob/master/banner.png)  
 
