@@ -1,6 +1,12 @@
 motd banner script
 ---
 
+Bash script for custom motd text banner
+- large text
+- color
+- auto / manual line break
+- `motd` auto modification / restore
+
 ![banner](https://github.com/rern/banner_script/blob/master/banner.png)  
 
 ```
