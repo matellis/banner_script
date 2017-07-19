@@ -12,7 +12,10 @@ OPTION:
 -m      - used as 'motd'          (in terminal login screen)
 -r      - restore original 'motd'
 
-STRING  - all characters will be converted to uppercase
+
+STRING    a-z (lowercase) : will be converted to uppercase
+          ' (single quote): must be escaped and place outside quotes
+          | (pipe)        : manual line break position
 ```
 
 **Download**
