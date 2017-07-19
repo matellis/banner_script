@@ -505,7 +505,7 @@ while :; do
 			sed -i '\|cat /etc/banner|d' /etc/profile
 			[[ -e /etc/motd.original ]] && mv /etc/motd{.original,}
 			cat /etc/motd
-			echo -e "Relogin to see this original 'mtod'."
+			echo -e "Relogin to see this original 'mtod'.";;
 		-h|-\?|--help) usage;;
 		-?*) echo -e "\nUnknown option: $1"
 			usage;;
