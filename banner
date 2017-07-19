@@ -505,7 +505,7 @@ while :; do
 			sed -i '\|cat /etc/banner|d' /etc/profile
 			[[ -e /etc/motd.original ]] && mv /etc/motd{.original,}
 			cat /etc/motd
-			echo -e "Relogin to see this original 'mtod'.";;
+			echo "Relogin to see this original 'mtod'.";;
 		-h|-\?|--help) usage;;
 		-?*) echo -e "\nUnknown option: $1"
 			usage;;
@@ -619,5 +619,5 @@ if [[ $motd ]]; then
 		echo 'cat /etc/motd.banner' >> /etc/profile
 	fi
 	mv /etc/motd{,.original}
-	echo -e "Relogin to see new 'mtod' banner.\n"
+	echo "Relogin to see new 'mtod' banner.\n"
 fi
