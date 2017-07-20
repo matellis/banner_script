@@ -6,7 +6,8 @@
 # by rern
 #
 
-hr=$( printf "\e[36m%*s\e[0m\n" "${COLUMNS:-$(tput cols)}" '' | tr ' ' '-' )
+width=$( tput cols ) # terminal width
+hr=$( printf "\e[36m%*s\e[0m\n" "${COLUMNS:-$width}" '' | tr ' ' '-' )
 info="\e[38;5;0m\e[48;5;3m i \e[0m"
 
 usage() {
@@ -102,7 +103,6 @@ array2banner() {
 # break string to array of each banner line
 string2array() {
 	str="$@"
-	width=$( tput cols ) # terminal width
 	# auto line break - if no '|' markers, add ones at each line break
 	if ! expr index "$str" '|' &> /dev/null; then
 		perline=$(( width / 6 -1 ))                   # banner characters per line
