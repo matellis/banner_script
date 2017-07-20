@@ -34,13 +34,13 @@ $hr
 # functions
 ################################################################################
 # 
-banner='' # output placeholder
+banner='' # banner lines placeholder
 array2banner() {
 	str="${@^^}" # convert to uppercase
 	for (( i=0; i < ${#str}; i++ )); do
-		# extract each character
+		# array element to character
 		char=${str:i:1}
-		# numbers and symbols substitue to use as variable names
+		# character to substitue - numbers and symbols to use as variable names
 		case "$char" in
 			[1-9]) char="n$char";;
 			0) char='O';;
@@ -76,8 +76,8 @@ array2banner() {
 			'?') char='question';;
 			[^A-Z,a-z]) char='space';;
 		esac
-		# array - name of each line of each character
-		# ABC -> ar0[0]=(A[0] B[0] C[0]); ar1[0]=(A[1] B[1] C[1]) ...
+		# character / substitute to array of lines - name of each line of each character
+		# A -> ar0[i]=(A[0]); ar1[i]=(A[1]) ...
 		ar0[i]=${char}[0]
 		ar1[i]=${char}[1]
 		ar2[i]=${char}[2]
@@ -85,39 +85,32 @@ array2banner() {
 		ar4[i]=${char}[4]
 	done
 
-	# subline - with '!'indirect variables - array of names to array of variables
+	# array of lines to lines of value sequence - with '!'indirect reference
 	# ar0=(A[0] B[0] C[0] ...) -> li0="$A[0] $B[0] $C[0] ... "
-	li0=" " li1=" "; li2=" "; li3=" "; li4=" "
+	li0=''; li1=''; li2=''; li3=''; li4=''
 	for (( i=0; i < ${#str}; i++ )); do # '$1'start '$2'end of each line
-		li0=$li0"${!ar0[i]} "
-		li1=$li1"${!ar1[i]} "
-		li2=$li2"${!ar2[i]} "
-		li3=$li3"${!ar3[i]} "
-		li4=$li4"${!ar4[i]} "
+		li0=$li0" ${!ar0[i]}"
+		li1=$li1" ${!ar1[i]}"
+		li2=$li2" ${!ar2[i]}"
+		li3=$li3" ${!ar3[i]}"
+		li4=$li4" ${!ar4[i]}"
 	done
 	
-	# truncate to terminal width
-	li0=${li0:0:$width} # '$width' from 'string2array'
-	li1=${li1:0:$width}
-	li2=${li2:0:$width}
-	li3=${li3:0:$width}
-	li4=${li4:0:$width}
-	
-	# line - append all sublines
+	# banner - append all lines
 	banner=$banner"\n$li0\n$li1\n$li2\n$li3\n$li4\n"
 }
 # break string to array of each banner line
 string2array() {
-	str="$1"
+	str="$@"
+	width=$( tput cols ) # terminal width
 	# auto line break - if no '|' markers, add ones at each line break
 	if ! expr index "$str" '|' &> /dev/null; then
-		width=$( tput cols )                       # terminal width
-		perline=$(( width / 6 ))                   # banner characters per line
+		perline=$(( width / 6 -1 ))                   # banner characters per line
 		str=$( echo "$str" | sed "s/.\{$perline\}/&|/g" )
 	fi
 	
 	IFS='|' read -ra arraystring <<< "$str"        # split string by '|' markers
-	
+	# loop each banner line
 	for (( j=0; j < ${#arraystring[*]}; j++ )); do # 'j' keep separation from 'i' loop
 		ar0=(); ar1=(); ar2=(); ar3=(); ar4=()     # empty subline arrays
 		array2banner "${arraystring[j]}"
