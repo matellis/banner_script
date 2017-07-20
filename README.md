@@ -26,6 +26,6 @@ STRING    a-z (lowercase) : will be converted to uppercase
 
 **Download**
 ```sh
-wget -qN --show-progress https://github.com/rern/banner_script/raw/master/banner -P /usr/local/bin; chmod +x /usr/local/bin/banner
+wget -q --show-progress https://github.com/rern/banner_script/raw/master/banner -P /usr/local/bin; chmod +x /usr/local/bin/banner
 ```
 ![chart](https://github.com/rern/banner_script/blob/master/color_chart.png)
