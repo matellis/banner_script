@@ -7,20 +7,21 @@
 #
 
 hr=$( printf "\e[36m%*s\e[0m\n" "${COLUMNS:-$(tput cols)}" '' | tr ' ' '-' )
+info="\e[38;5;0m\e[48;5;3m i \e[0m"
 
 usage() {
 	example
 	echo "example:  banner -c 6 'banner|script'"
 	echo -e "
 $hr
-usage  :  banner [OPTION] 'STRING'
+usage  :  banner [OPTION]... 'STRING'
 $hr
 
 OPTION:
--c N    - color code              (256 colors mode)
--f FILE - save to file            (to be used as 'cat file')
--m      - used as 'motd'          (in terminal login screen)
--r      - restore original 'motd'
+-c N      color code              (256 colors mode)
+-f FILE   save to file            (to be used as 'cat file')
+-m        used as 'motd'          (in terminal login screen)
+-r        restore original 'motd'
 
 STRING    a-z (lowercase) : will be converted to uppercase
           ' (single quote): must be escaped and place outside quotes
@@ -32,9 +33,11 @@ $hr
 
 # functions
 ################################################################################
-string2array() {
+# 
+banner='' # output placeholder
+array2banner() {
 	str="${@^^}" # convert to uppercase
-	for (( i=0 ; i < ${#str} ; i++ )); do
+	for (( i=0; i < ${#str}; i++ )); do
 		# extract each character
 		char=${str:i:1}
 		# numbers and symbols substitue to use as variable names
@@ -73,59 +76,62 @@ string2array() {
 			'?') char='question';;
 			[^A-Z,a-z]) char='space';;
 		esac
-		# array - name of each line of each character: ar0=(A[0], B[0], C[0], ..)
+		# array - name of each line of each character
+		# ABC -> ar0[0]=(A[0] B[0] C[0]); ar1[0]=(A[1] B[1] C[1]) ...
 		ar0[i]=${char}[0]
 		ar1[i]=${char}[1]
 		ar2[i]=${char}[2]
 		ar3[i]=${char}[3]
 		ar4[i]=${char}[4]
 	done
-}
 
-lines=''
-array2line() { # with '!'indirect variables to array: li0=" $A[0] $B[0] $C[0] ... "
-	# sublines
+	# subline - with '!'indirect variables - array of names to array of variables
+	# ar0=(A[0] B[0] C[0] ...) -> li0="$A[0] $B[0] $C[0] ... "
 	li0=" " li1=" "; li2=" "; li3=" "; li4=" "
-	for (( i=$1 ; i < $2 ; i++ )); do # '$1'start '$2'end of each line
+	for (( i=0; i < ${#str}; i++ )); do # '$1'start '$2'end of each line
 		li0=$li0"${!ar0[i]} "
 		li1=$li1"${!ar1[i]} "
 		li2=$li2"${!ar2[i]} "
 		li3=$li3"${!ar3[i]} "
 		li4=$li4"${!ar4[i]} "
 	done
-	# sublines to lines
-	lines=$lines"\n$li0\n$li1\n$li2\n$li3\n$li4\n"
+	
+	# truncate to terminal width
+	li0=${li0:0:$width} # '$width' from 'string2array'
+	li1=${li1:0:$width}
+	li2=${li2:0:$width}
+	li3=${li3:0:$width}
+	li4=${li4:0:$width}
+	
+	# line - append all sublines
+	banner=$banner"\n$li0\n$li1\n$li2\n$li3\n$li4\n"
+}
+# break string to array of each banner line
+string2array() {
+	str="$1"
+	# auto line break - if no '|' markers, add ones at each line break
+	if ! expr index "$str" '|' &> /dev/null; then
+		width=$( tput cols )                       # terminal width
+		perline=$(( width / 6 ))                   # banner characters per line
+		str=$( echo "$str" | sed "s/.\{$perline\}/&|/g" )
+	fi
+	
+	IFS='|' read -ra arraystring <<< "$str"        # split string by '|' markers
+	
+	for (( j=0; j < ${#arraystring[*]}; j++ )); do # 'j' keep separation from 'i' loop
+		ar0=(); ar1=(); ar2=(); ar3=(); ar4=()     # empty subline arrays
+		array2banner "${arraystring[j]}"
+	done
 }
 
-line2banner() {
-# auto line wrap
-if ! expr index "$1" '|' &> /dev/null; then
-	# line wrap to terminal width
-	width=$( tput cols )         # terminal width
-	perline=$(( width / 6 - 1 )) # banner characters per line
-	stringlength="${#1}"           # string length
-	lastline=0                   
-	[[ $(( stringlength % perline )) > 0 ]] && lastline=1 # remainder line
-	bannerline=$(( stringlength / perline + lastline ))   # total banner lines
-
-	string2array "$1" # convert input string to array
-	charcount=$perline
-	for (( i=0 ; i < $stringlength ; $(let "i+=$perline") )); do # convert array to banner lines
-		array2line $i $charcount
-		charcount=$(( charcount + perline ))
-	done
-# manual line wrap with '|'
-else
-	IFS='|' read -ra linearray <<< "$1"     # split string by '|'
-	for (( j=0; j < ${#linearray[*]}; j++ )); do # 'j' keep separation from 'i' loop
-		ar0=(); ar1=(); ar2=(); ar3=(); ar4=()   # empty subline arrays
-		string2array "${linearray[j]}"
-		array2line 0 ${#linearray[j]}
-	done
-fi
+# for usage function
+example() {
+	string2array 'banner|script'
+	echo -e "\e[36m$banner\e[0m"
 }
 
 # options
+################################################################################
 colorL=''
 colorR=''
 file=''
@@ -139,7 +145,7 @@ while :; do
 			shift;;
 		-m) motd=1;;
 		-r) if [[ ! -f /etc/motd.banner ]]; then
-				echo -e "\nNo custom 'motd' banner found.\n"
+				echo -e "\n$info No custom 'motd' banner found.\n"
 				exit
 			fi
 			rm -f /etc/motd.banner
@@ -147,10 +153,10 @@ while :; do
 			sed -i '\|cat /etc/banner|d' /etc/profile
 			[[ -e /etc/motd.original ]] && mv /etc/motd{.original,}
 			cat /etc/motd
-			echo -e "Relogin to see this original 'mtod'.\n"
+			echo -e "$info Relogin to see this original 'mtod'.\n"
 			exit;;
 		-h|-\?|--help) ;;
-		-?*) echo -e "\nUnknown option: $1";;
+		-?*) echo -e "\n$info Unknown option: $1";;
 		*) break
 	esac
 	shift
@@ -618,34 +624,34 @@ quote=(
 
 # commands
 ################################################################################
-line2banner "$@"
+string2array "$@"
 
 # output
-banner="$colorL$lines$colorR"
-echo -e "$banner"
+bannercolor="$colorL$banner$colorR"
+echo -e "$bannercolor"
 
 # save to file
 if [[ $file ]]; then
-	echo -e "$banner" > $file
-	echo -e "\ncat $file \e[38;5;240m# to display the banner\e[0m\n"
+	echo -e "$bannercolor" > $file
+	echo -e "\n$info cat $file \e[38;5;240m# to display the banner\e[0m\n"
 fi
 
 # modify 'motd'
 if [[ $motd ]]; then
-	echo -e "$banner" > /etc/motd.banner
-	if [[ -d /etc/profile.d ]]; then
-		echo -e '#!/bin/bash\ncat /etc/motd.banner' > /etc/profile.d/motd.sh
-		chmod +x /etc/profile.d/motd.sh
+	if [[ $# > 0 ]]; then
+		echo -e "$bannercolor" > /etc/motd.banner
+		if [[ -d /etc/profile.d ]]; then
+			echo -e '#!/bin/bash\ncat /etc/motd.banner' > /etc/profile.d/motd.sh
+			chmod +x /etc/profile.d/motd.sh
+		else
+			echo 'cat /etc/motd.banner' >> /etc/profile
+		fi
+		mv /etc/motd{,.original}
+		echo -e "$info Relogin to see new 'mtod' banner.\n"
 	else
-		echo 'cat /etc/motd.banner' >> /etc/profile
+		echo -e "$info No input for new 'motd' banner."
+		usage
 	fi
-	mv /etc/motd{,.original}
-	echo -e "Relogin to see new 'mtod' banner.\n"
 fi
 
-# for usage function
-example() {
-	line2banner 'banner|script'
-	echo -e "\e[36m$lines\e[0m"
-}
 [[ $# == 0 ]] && usage
