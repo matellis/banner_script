@@ -13,11 +13,13 @@ Bash script for custom motd text banner
 usage:   banner [OPTION]... 'STRING'
 
 OPTION:
--c N    - color code              (256 colors mode)
--f file - save to file            (to be used as 'cat output')
--m      - used as 'motd'          (in terminal login screen)
--r      - restore original 'motd'
-
+--color   display color chart
+-b N      N - background color code ('0' black - default)
+-c N      N - character color code  ('7' light gray - default)
+-f FILE   save to FILE              (to be used as 'cat file')
+-m        used as 'motd'            (in terminal login screen)
+-r        restore original 'motd'
+-t C      C - character             ('#' default)
 
 STRING    a-z (lowercase) : will be converted to uppercase
           ' (single quote): must be escaped and place outside quotes
