@@ -681,7 +681,7 @@ if [[ $motd ]]; then
 			echo 'cat /etc/motd.banner' >> /etc/profile
 		fi
 		mv /etc/motd{,.original}
-		echo -e "$info Relogin to see new 'mtod' banner.\n"
+		echo -e "$info Relogin to see new 'motd' banner.\n"
 	else
 		echo -e "$info No input for new 'motd' banner."
 		usage
