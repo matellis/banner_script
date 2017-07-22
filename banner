@@ -1,32 +1,29 @@
 #!/bin/bash
 
-### banner
-#
 ### Banner with color ###
 # by rern
-#
 
 width=$( tput cols ) # terminal width
 hr=$( printf "\e[36m%*s\e[0m\n" "${COLUMNS:-$width}" '' | tr ' ' '-' )
-info="\e[38;5;0m\e[48;5;3m i \e[0m"
+info="\e[38;5;0m\e[48;5;11m i \e[0m"
 
 usage() {
 	example
-	echo "example:  banner -c 6 'banner|script'"
+	echo "example:  ${0##*/} -c 6 'banner|script'"
 	echo -e "
 $hr
-usage  :  banner [OPTION]... 'STRING'
+usage  :  ${0##*/} [OPTIONS...] STRING
 $hr
 
-OPTION:
---color   display color chart
--b N      N - background color code ('0' black - default)
--c N      N - character color code  ('7' white - default)
+OPTIONS:
+-b N      N = background color code ('0' black - default)
+-c N      N = character color code  ('7' white - default)
+-C        display color chart
 -f FILE   save to FILE              (to be used as 'cat file')
 -i        interactive mode          (-c, -m options only)
 -m        used as 'motd'            (in terminal login screen)
 -r        restore original 'motd'
--t C      C - character             ('#' default)
+-t C      C = single character      ('#' default)
 
 STRING    a-z (lowercase) : will be converted to uppercase
           ' (single quote): must be escaped and place outside quotes
@@ -163,7 +160,7 @@ restore() {
 # for usage function
 example() {
 	color=6
-	string2array 'banner|script'
+	string2array "${0##*/}|script"
 }
 
 colorchart() {
@@ -178,24 +175,38 @@ colorchart() {
 }
 
 interactive() {
-	echo
-	echo -ne "$info Text:  "
+	echo -ne "\n$info Text:  "
 	read text
-	echo
-	echo -e '  1 \e[1m\e[38;5;1m# Red\e[0m'
-	echo -e '  2 \e[1m\e[38;5;2m# Green\e[0m'
-	echo -e '  3 \e[1m\e[38;5;3m# Yellow\e[0m'
-	echo -e '  4 \e[1m\e[38;5;4m# Blue\e[0m'
-	echo -e '  5 \e[1m\e[38;5;5m# Magenta\e[0m'
-	echo -e '  6 \e[1m\e[38;5;6m# Cyan\e[0m'
-	echo -e '  7 \e[1m\e[38;5;7m# White\e[0m (default)'
-	echo
-	echo -ne "$info Color (1 - \e[0;36m7\e[m):  "
-	read -n 1 color
-	[[ -z $color ]] && color=7
-	echo
+	c0='\e[0m'        # reset color
+	c1='\e[38;5;196m' # red
+	c2='\e[38;5;10m'  # green
+	c3='\e[38;5;11m'  # yellow
+	c4='\e[38;5;27m'  # blue
+	c5='\e[38;5;13m'  # magenta
+	c6='\e[38;5;14m'  # cyan
+	c7='\e[38;5;15m'  # white
+	echo -e "
+$c1  # $c2   ### $c3  ### $c4    # $c5 #### $c6  ###  $c7#####
+$c1 ## $c2  #   #$c3 #   #$c4   ## $c5 #    $c6 #     $c7   # 
+$c1  # $c2     # $c3    # $c4  # # $c5 #### $c6 ##### $c7  #  
+$c1  # $c2   #   $c3 #   #$c4 #####$c5     #$c6 #   # $c7 #   
+$c1 ###$c2  #####$c3  ### $c4    # $c5 #### $c6  ###  $c7 #   
+$c0"
+	echo -ne "$info Color (1 - ${c6}7$c0):  "
+	read -n 1 co
+	case $co in
+		'') color=15;;
+		1) color=196;;
+		2) color=10;;
+		3) color=11;;
+		4) color=27;;
+		5) color=13;;
+		6) color=14;;
+		*) color=$co
+	esac
+	[[ $color != 15 ]] && echo
 	string2array "$text"
-	echo -ne "$info Use as 'motd' in terminal login (\e[0;36mNo\e[0m / Yes):  "
+	echo -ne "$info Use as 'motd' in terminal login (${c6}No$c0 / Yes):  "
 	read -n 1 mo
 	echo ' '
 	[[ ${mo,,} == y ]] && motd=1 || exit
@@ -670,22 +681,24 @@ motd=''
 character=''
 while :; do
 	case $1 in
-		'') usage;;
-		--color) colorchart
-			exit;;
+		'') echo -e "\n$info \e[36m${0##*/}\e[0m needs input for STRING"
+			usage;;
 		-b) bg=$2
 			shift;;
 		-c) color=$2
 			shift;;
+		-C) colorchart
+			exit;;
 		-f) file=$2
 			shift;;
 		-i) interactive;;
 		-m) motd=1;;
 		-r) restore
 			exit;;
-		-t) character=$2
+		-t) ch=${2:0:1}
+			character=${ch^^}
 			shift;;
-		-h|-\?|--help) usage;;
+		-\?|--help) usage;;
 		-?*) echo -e "\n$info Unknown option: $1";;
 		*) break
 	esac
@@ -696,11 +709,10 @@ done
 ################################################################################
 [[ -z $bannerout ]] && string2array "$@"
 
-
 # save to file
 if [[ $file ]]; then
 	echo -e "$bannerout" > $file
-	echo -e "\n$info cat $file \e[38;5;240m# to display the banner\e[0m\n"
+	echo -e "\n$info Display the banner: cat $file\n"
 fi
 
 # modify 'motd'
