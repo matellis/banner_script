@@ -21,8 +21,9 @@ $hr
 OPTION:
 --color   display color chart
 -b N      N - background color code ('0' black - default)
--c N      N - character color code  ('7' light gray - default)
+-c N      N - character color code  ('7' white - default)
 -f FILE   save to FILE              (to be used as 'cat file')
+-i        interactive mode          (-c, -m options only)
 -m        used as 'motd'            (in terminal login screen)
 -r        restore original 'motd'
 -t C      C - character             ('#' default)
@@ -137,12 +138,32 @@ string2array() {
 		substring=$( echo "${arraystring[j]}" | sed -e 's/^ //' -e 's/ $//' ) # remove leading / trailing space
 		array2banner "$substring"
 	done
+	
+	# output
+	bannerout=$( echo "$banner" | sed -e 's/#\+/\\e[1m\\e[38;5;'$color'm\\e[48;5;'$bg'm&/g' -e 's/#\+/&\\e[0m/g' )
+	if [[ $character ]]; then
+		bannerout=$( echo "$bannerout" | sed 's/#/'$character'/g' )
+	fi
+	echo -e "$bannerout"
+}
+
+restore() {
+	if [[ ! -f /etc/motd.banner ]]; then
+		echo -e "\n$info No custom 'motd' banner found.\n"
+		exit
+	fi
+	rm -f /etc/motd.banner
+	rm -f /etc/profile.d/motd.sh
+	sed -i '\|cat /etc/banner|d' /etc/profile
+	[[ -e /etc/motd.original ]] && mv /etc/motd{.original,}
+	cat /etc/motd
+	echo -e "$info Relogin to see this original 'mtod'.\n"
 }
 
 # for usage function
 example() {
+	color=6
 	string2array 'banner|script'
-	echo -e "\e[1m\e[36m$banner\e[0m"
 }
 
 colorchart() {
@@ -156,43 +177,29 @@ colorchart() {
 	echo
 }
 
-# options
-################################################################################
-bg=0
-color=7
-file=''
-motd=''
-character=''
-while :; do
-	case $1 in
-		--color) colorchart
-			exit;;
-		-b) bg=$2
-			shift;;
-		-c) color=$2
-			shift;;
-		-f) file=$2
-			shift;;
-		-m) motd=1;;
-		-r) if [[ ! -f /etc/motd.banner ]]; then
-				echo -e "\n$info No custom 'motd' banner found.\n"
-				exit
-			fi
-			rm -f /etc/motd.banner
-			rm -f /etc/profile.d/motd.sh
-			sed -i '\|cat /etc/banner|d' /etc/profile
-			[[ -e /etc/motd.original ]] && mv /etc/motd{.original,}
-			cat /etc/motd
-			echo -e "$info Relogin to see this original 'mtod'.\n"
-			exit;;
-		-t) character=$2
-			shift;;
-		-h|-\?|--help) ;;
-		-?*) echo -e "\n$info Unknown option: $1";;
-		*) break
-	esac
-	shift
-done
+interactive() {
+	echo
+	echo -ne "$info Text:  "
+	read text
+	echo
+	echo -e '  1 \e[1m\e[38;5;1m# Red\e[0m'
+	echo -e '  2 \e[1m\e[38;5;2m# Green\e[0m'
+	echo -e '  3 \e[1m\e[38;5;3m# Yellow\e[0m'
+	echo -e '  4 \e[1m\e[38;5;4m# Blue\e[0m'
+	echo -e '  5 \e[1m\e[38;5;5m# Magenta\e[0m'
+	echo -e '  6 \e[1m\e[38;5;6m# Cyan\e[0m'
+	echo -e '  7 \e[1m\e[38;5;7m# White\e[0m (default)'
+	echo
+	echo -ne "$info Color (1 - \e[0;36m7\e[m):  "
+	read -n 1 color
+	[[ -z $color ]] && color=7
+	echo
+	string2array "$text"
+	echo -ne "$info Use as 'motd' in terminal login (\e[0;36mNo\e[0m / Yes):  "
+	read -n 1 mo
+	echo ' '
+	[[ ${mo,,} == y ]] && motd=1 || exit
+}
 
 # variables - font matrix
 ################################################################################
@@ -654,16 +661,41 @@ quote=(
 '     '
 )
 
-# commands
+# options
 ################################################################################
-string2array "$@"
+bg=0
+color=7
+file=''
+motd=''
+character=''
+while :; do
+	case $1 in
+		'') usage;;
+		--color) colorchart
+			exit;;
+		-b) bg=$2
+			shift;;
+		-c) color=$2
+			shift;;
+		-f) file=$2
+			shift;;
+		-i) interactive;;
+		-m) motd=1;;
+		-r) restore
+			exit;;
+		-t) character=$2
+			shift;;
+		-h|-\?|--help) usage;;
+		-?*) echo -e "\n$info Unknown option: $1";;
+		*) break
+	esac
+	shift
+done
 
-# output
-bannerout=$( echo "$banner" | sed -e 's/#\+/\\e[1m\\e[38;5;'$color'm\\e[48;5;'$bg'm&/g' -e 's/#\+/&\\e[0m/g' )
-if [[ $character ]]; then
-	bannerout=$( echo "$bannerout" | sed 's/#/'$character'/g' )
-fi
-echo -e "$bannerout"
+# main commands
+################################################################################
+[[ -z $bannerout ]] && string2array "$@"
+
 
 # save to file
 if [[ $file ]]; then
@@ -673,7 +705,7 @@ fi
 
 # modify 'motd'
 if [[ $motd ]]; then
-	if [[ $# > 0 ]]; then
+	if [[ $bannerout ]]; then
 		echo -e "$bannerout" > /etc/motd.banner
 		if [[ -d /etc/profile.d ]]; then
 			echo -e '#!/bin/bash\ncat /etc/motd.banner' > /etc/profile.d/motd.sh
@@ -681,12 +713,10 @@ if [[ $motd ]]; then
 		else
 			echo 'cat /etc/motd.banner' >> /etc/profile
 		fi
-		mv /etc/motd{,.original}
-		echo -e "$info Relogin to see new 'motd' banner.\n"
+		mv /etc/motd{,.original} &> /dev/null
+		echo -e "\n$info Relogin to see new 'motd' banner.\n"
 	else
 		echo -e "$info No input for new 'motd' banner."
 		usage
 	fi
 fi
-
-[[ $# == 0 ]] && usage
