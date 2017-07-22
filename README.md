@@ -27,7 +27,8 @@ STRING    a-z (lowercase) : will be converted to uppercase
           | (pipe)        : manual line break position
 ```
 
-**Download**
+**Install**  
+(download to `/usr/local/bin`)
 ```sh
 wget -q --show-progress https://github.com/rern/banner_script/raw/master/banner -O /usr/local/bin/banner; chmod +x /usr/local/bin/banner
 ```
