@@ -10,16 +10,17 @@ Bash script for custom motd text banner
 ![banner](https://github.com/rern/banner_script/blob/master/banner.png)  
 
 ```
-usage:   banner [OPTION]... 'STRING'
+usage:   banner [OPTIONS...] 'STRING'
 
-OPTION:
---color   display color chart
--b N      N - background color code ('0' black - default)
--c N      N - character color code  ('7' light gray - default)
+OPTIONS:
+-b N      N = background color code ('0' black - default)
+-c N      N = character color code  ('7' white - default)
+-C        display color chart
 -f FILE   save to FILE              (to be used as 'cat file')
+-i        interactive mode          (-c, -m options only)
 -m        used as 'motd'            (in terminal login screen)
 -r        restore original 'motd'
--t C      C - character             ('#' default)
+-t C      C = single character      ('#' default)
 
 STRING    a-z (lowercase) : will be converted to uppercase
           ' (single quote): must be escaped and place outside quotes
