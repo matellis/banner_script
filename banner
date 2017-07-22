@@ -41,7 +41,7 @@ array2banner() {
 	local string="${@^^}" # convert to uppercase
 	for (( i=0; i < ${#string}; i++ )); do
 		# array element to character
-		char=${string:i:1}
+		local char=${string:i:1}
 		# character to substitue - numbers and symbols to use as variable names
 		case "$char" in
 			[1-9]) char="n$char";;
@@ -116,7 +116,7 @@ string2array() {
 				string="$string|${arraymanual[j]}"
 			else
 				# split strings in array if longer than banner line
-				substring=$( echo "${arraymanual[j]}" | sed "s/.\{$bannerwidth\}/&|/g" )
+				local substring=$( echo "${arraymanual[j]}" | sed "s/.\{$bannerwidth\}/&|/g" )
 				string="$string|${substring[@]}"
 			fi
 		done
@@ -159,14 +159,14 @@ restore() {
 
 # for usage function
 example() {
-	color=6
+	color=14
 	string2array "${0##*/}|script"
 }
 
 colorchart() {
 	echo
 		for i in {0..255}; do
-			code=$( printf %03d $i )
+			local code=$( printf %03d $i )
 			printf "\e[48;5;${i}m  \e[0m \e[38;5;${i}m$code\e[0m  "
 			(( i == 7 )) || (( i == 243 )) || (( i == 255 )) && echo
 			( (( i == 15 )) || (( i > 15 )) && (( i < 232 )) && (( (i-15) % 6 == 0 )) ) && echo
