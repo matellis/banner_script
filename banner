@@ -38,11 +38,12 @@ $hr
 # 
 banner='' # outside function for appending multiple lines
 array2banner() {
-	local string="${@^^}" # convert to uppercase
-	local arrayline0=(); arrayline1=(); arrayline2=(); arrayline3=(); arrayline4=()     # empty subline arrays
+	local string arrayline0 arrayline1 arrayline2 arrayline3 arrayline4 char line0 line1 line2 line3 line4
+	string="${@^^}" # convert to uppercase
+	arrayline0=(); arrayline1=(); arrayline2=(); arrayline3=(); arrayline4=()
 	for (( i=0; i < ${#string}; i++ )); do
 		# array element to character
-		local char=${string:i:1}
+		char=${string:i:1}
 		# character to substitue - numbers and symbols to use as variable names
 		case "$char" in
 			[1-9]) char="n$char";;
@@ -90,7 +91,7 @@ array2banner() {
 
 	# array of lines to lines of value sequence - with '!'indirect reference
 	# arrayline0=(A[0] B[0] C[0] ...) -> line0="$A[0] $B[0] $C[0] ... "
-	local line0='' line1='' line2='' line3='' line4=''
+	line0='' line1='' line2='' line3='' line4=''
 	for (( i=0; i < ${#string}; i++ )); do
 		line0=$line0" ${!arrayline0[i]}"
 		line1=$line1" ${!arrayline1[i]}"
@@ -103,7 +104,8 @@ array2banner() {
 }
 # break string to array of each banner line
 string2array() {
-	local string="$@"
+	local string bannerwidth arraymanual substring arraystring
+	string="$@"
 	bannerwidth=$(( width / 6 )) # banner characters per line
 
 	if expr index "$string" '|' &> /dev/null; then
@@ -117,7 +119,7 @@ string2array() {
 				string="$string|${arraymanual[j]}"
 			else
 				# split strings in array if longer than banner line
-				local substring=$( echo "${arraymanual[j]}" | sed "s/.\{$bannerwidth\}/&|/g" )
+				substring=$( echo "${arraymanual[j]}" | sed "s/.\{$bannerwidth\}/&|/g" )
 				string="$string|${substring[@]}"
 			fi
 		done
@@ -132,7 +134,7 @@ string2array() {
 	
 	# loop each banner line
 	for (( j=0; j < ${#arraystring[*]}; j++ )); do # 'j' keep separation from 'i' loop
-		local substring=$( echo "${arraystring[j]}" | sed -e 's/^ //' -e 's/ $//' ) # remove leading / trailing space
+		substring=$( echo "${arraystring[j]}" | sed -e 's/^ //' -e 's/ $//' ) # remove leading / trailing space
 		array2banner "$substring"
 	done
 	
@@ -164,9 +166,10 @@ example() {
 }
 
 colorchart() {
+	local code
 	echo
 		for i in {0..255}; do
-			local code=$( printf %03d $i )
+			code=$( printf %03d $i )
 			printf "\e[48;5;${i}m  \e[0m \e[38;5;${i}m$code\e[0m  "
 			(( i == 7 )) || (( i == 243 )) || (( i == 255 )) && echo
 			( (( i == 15 )) || (( i > 15 )) && (( i < 232 )) && (( (i-15) % 6 == 0 )) ) && echo
