@@ -36,9 +36,10 @@ $hr
 # functions
 ################################################################################
 # 
-banner='' # banner lines placeholder
+banner='' # outside function for appending multiple lines
 array2banner() {
 	local string="${@^^}" # convert to uppercase
+	local arrayline0=(); arrayline1=(); arrayline2=(); arrayline3=(); arrayline4=()     # empty subline arrays
 	for (( i=0; i < ${#string}; i++ )); do
 		# array element to character
 		local char=${string:i:1}
@@ -131,8 +132,7 @@ string2array() {
 	
 	# loop each banner line
 	for (( j=0; j < ${#arraystring[*]}; j++ )); do # 'j' keep separation from 'i' loop
-		arrayline0=(); arrayline1=(); arrayline2=(); arrayline3=(); arrayline4=()     # empty subline arrays
-		substring=$( echo "${arraystring[j]}" | sed -e 's/^ //' -e 's/ $//' ) # remove leading / trailing space
+		local substring=$( echo "${arraystring[j]}" | sed -e 's/^ //' -e 's/ $//' ) # remove leading / trailing space
 		array2banner "$substring"
 	done
 	
