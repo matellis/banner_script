@@ -30,6 +30,6 @@ STRING    a-z (lowercase) : will be converted to uppercase
 **Install**  
 (download to `/usr/local/bin`)
 ```sh
-wget -qN --show-progress --no-check-certificate https://github.com/rern/banner_script/raw/master/banner -O /usr/local/bin/banner; chmod +x /usr/local/bin/banner
+wget -qN --show-progress https://github.com/rern/banner_script/raw/master/banner -O /usr/local/bin/banner; chmod +x /usr/local/bin/banner
 ```
 ![chart](https://github.com/rern/banner_script/blob/master/color_chart.png)
