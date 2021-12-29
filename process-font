@@ -1,0 +1,8 @@
+#!/bin/bash
+chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890.:,;\"+-*/^=<>%!@#$&_\\{[()]}?'"
+for ((i=0; i < ${#chars}; i++)); do
+  value="${chars:i:1}"
+  echo "$value=("
+  echo -n \'; figlet "$value" | sed ':a;N;$!ba;s/\n/\x27\n\x27/g' | head -5
+  echo ")"
+done
